@@ -1,134 +1,139 @@
-<!-- todo-app/index.html -->
+<!-- calculator-app/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ToDo App</title>
+<title>Calculator App</title>
 <style>
 body {
   font-family: 'Arial', sans-serif;
   display: flex;
   justify-content: center;
-  padding:50px;
+  align-items: center;
+  min-height: 100vh;
   background: linear-gradient(135deg, #00bcd4, #8e44ad);
 }
 
-.container {
-  background:white;
-  padding:20px;
-  border-radius:15px;
-  width:100%;
-  max-width:400px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+.calculator {
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 15px 25px rgba(0,0,0,0.3);
+  width: 300px;
 }
 
-h1 { text-align:center; color:#00bcd4; margin-bottom:20px; }
+.display {
+  background: #222;
+  color: #fff;
+  font-size: 2em;
+  text-align: right;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
 
-input {
-  width:calc(100% - 60px);
-  padding:10px;
-  border-radius:5px;
-  border:1px solid #ccc;
-  margin-bottom:10px;
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
 }
 
 button {
-  padding:10px;
-  border:none;
-  border-radius:5px;
-  background:#00bcd4;
-  color:white;
-  cursor:pointer;
-  transition:all 0.2s;
+  padding: 20px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #00bcd4;
+  color: #fff;
+  transition: all 0.2s ease;
 }
 
-button:hover { background:#8e44ad; }
-
-ul {
-  list-style:none;
-  padding:0;
+button:hover {
+  background: #8e44ad;
+  transform: scale(1.05);
 }
 
-li {
-  display:flex;
-  justify-content:space-between;
-  background:#f4f4f4;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:5px;
-  align-items:center;
+button.operator {
+  background: #ff9800;
 }
 
-li button {
-  background:#f44336;
-  padding:5px 10px;
+button.clear {
+  background: #f44336;
+  grid-column: span 2;
 }
 
-li button:hover { background:#d32f2f; }
-
-.edit-btn {
-  background:#ff9800;
-  margin-right:5px;
+button.equal {
+  background: #4caf50;
+  grid-column: span 2;
 }
-
-.edit-btn:hover { background:#f57c00; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>ToDo App</h1>
-  <div style="display:flex; gap:5px;">
-    <input type="text" id="taskInput" placeholder="Add a new task">
-    <button onclick="addTask()">Add</button>
+<div class="calculator">
+  <div id="display" class="display">0</div>
+  <div class="buttons">
+    <button onclick="appendNumber('7')">7</button>
+    <button onclick="appendNumber('8')">8</button>
+    <button onclick="appendNumber('9')">9</button>
+    <button class="operator" onclick="appendOperator('/')">/</button>
+
+    <button onclick="appendNumber('4')">4</button>
+    <button onclick="appendNumber('5')">5</button>
+    <button onclick="appendNumber('6')">6</button>
+    <button class="operator" onclick="appendOperator('*')">*</button>
+
+    <button onclick="appendNumber('1')">1</button>
+    <button onclick="appendNumber('2')">2</button>
+    <button onclick="appendNumber('3')">3</button>
+    <button class="operator" onclick="appendOperator('-')">-</button>
+
+    <button onclick="appendNumber('0')">0</button>
+    <button onclick="appendNumber('.')">.</button>
+    <button class="operator" onclick="appendOperator('+')">+</button>
+    <button class="operator" onclick="appendOperator('%')">%</button>
+
+    <button class="clear" onclick="clearDisplay()">C</button>
+    <button class="equal" onclick="calculateResult()">=</button>
   </div>
-  <ul id="taskList"></ul>
 </div>
 
 <script>
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let display = document.getElementById('display');
+let currentInput = '';
 
-function renderTasks() {
-  const list = document.getElementById('taskList');
-  list.innerHTML = '';
-  tasks.forEach((task, index)=>{
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <span>${task}</span>
-      <div>
-        <button class="edit-btn" onclick="editTask(${index})">Edit</button>
-        <button onclick="deleteTask(${index})">Delete</button>
-      </div>
-    `;
-    list.appendChild(li);
-  });
-  localStorage.setItem('tasks', JSON.stringify(tasks));
+function appendNumber(num) {
+  if(currentInput === '0') currentInput = '';
+  currentInput += num;
+  display.innerText = currentInput;
 }
 
-function addTask(){
-  const input = document.getElementById('taskInput');
-  if(input.value.trim() === '') return;
-  tasks.push(input.value.trim());
-  input.value = '';
-  renderTasks();
+function appendOperator(op) {
+  if(currentInput === '') return;
+  const lastChar = currentInput.slice(-1);
+  if(['+','-','*','/','%'].includes(lastChar)) return;
+  currentInput += op;
+  display.innerText = currentInput;
 }
 
-function deleteTask(index){
-  tasks.splice(index,1);
-  renderTasks();
+function clearDisplay() {
+  currentInput = '';
+  display.innerText = '0';
 }
 
-function editTask(index){
-  const newTask = prompt('Edit task:', tasks[index]);
-  if(newTask !== null && newTask.trim() !== ''){
-    tasks[index] = newTask.trim();
-    renderTasks();
+function calculateResult() {
+  try {
+    let result = eval(currentInput);
+    display.innerText = result;
+    currentInput = result.toString();
+  } catch {
+    display.innerText = 'Error';
+    currentInput = '';
   }
 }
-
-// initial render
-renderTasks();
 </script>
 
 </body>
