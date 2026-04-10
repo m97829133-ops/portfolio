@@ -32,9 +32,9 @@ A clean and responsive portfolio including:
 
  **Contact
 
-- Email: your-email@gmail.com  
-- GitHub: https://github.com/yourusername  
-- LinkedIn: https://linkedin.com/in/yourprofile  
+- Email: your-m97829133@gmail.com  
+- GitHub: https://github.com/ m97829133-ops
+- LinkedIn: https://www.linkedin.com/in/malaika-yousaf-/ 
 
 ** Note
 
